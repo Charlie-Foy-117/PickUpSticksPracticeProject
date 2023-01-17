@@ -15,18 +15,10 @@ int main()
 
     sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Pick Up Sticks", sf::Style::None);
 
-    sf::Texture playerTexture;
-    sf::Texture grassTexture;
-
-    int randomNumGenX, randomNumGenY;
-
-    /* initialize random seed: */
     srand(time(NULL));
 
-    /* generate secret number between 1 and 10: */
-    randomNumGenX = rand() % (window.getSize().x - grassTexture.getSize().x);
-    randomNumGenY = rand() % (window.getSize().y - grassTexture.getSize().y);
-
+    sf::Texture playerTexture;
+    sf::Texture grassTexture;
 
 
     if (!playerTexture.loadFromFile("Assets/Player_Stand.png"))
@@ -58,6 +50,7 @@ int main()
 
     for (size_t i = 0; i < numGrassSprites; i++)
     {
+        grassSprite.setPosition(sf::Vector2f(rand() % (window.getSize().x - grassTexture.getSize().x), rand() % (window.getSize().y - grassTexture.getSize().y)));
         grassSpriteVector.push_back(grassSprite);
     }
 
@@ -108,7 +101,6 @@ int main()
         //draw all things
         for (size_t i = 0; i < grassSpriteVector.size(); i++)
         {
-            grassSpriteVector[i].setPosition(sf::Vector2f(randomNumGenX, randomNumGenY));
             window.draw(grassSpriteVector[i]);
         }
         window.draw(playerSprite);
