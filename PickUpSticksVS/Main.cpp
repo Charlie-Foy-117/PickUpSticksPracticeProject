@@ -19,6 +19,7 @@ int main()
 
     sf::Texture playerTexture;
     sf::Texture grassTexture;
+    sf::Texture stickTexture;
 
 
     if (!playerTexture.loadFromFile("Assets/Player_Stand.png"))
@@ -41,21 +42,80 @@ int main()
         std::cout << "Texture load was successful for Assets/Grass.png" << std::endl;
     }
 
+    if (!stickTexture.loadFromFile("Assets/Stick.png"))
+    {
+        //error
+        std::cout << "Texture load failed for Assets/Stick.png" << std::endl;
+    }
+    else
+    {
+        std::cout << "Texture load was successful for Assets/Stick.png" << std::endl;
+    }
+
     sf::Sprite playerSprite;
     sf::Sprite grassSprite;
-    grassSprite.setTexture(grassTexture);
+    sf::Sprite stickSprite;
     playerSprite.setTexture(playerTexture);
-    std::vector<sf::Sprite> grassSpriteVector;
-    int numGrassSprites = 5;
+    grassSprite.setTexture(grassTexture);
+    stickSprite.setTexture(stickTexture);
 
-    for (size_t i = 0; i < numGrassSprites; i++)
+    std::vector<sf::Sprite> grassSpriteVector;
+    size_t numGrassSprites = 15;
+
+    for (size_t i = 0; i < numGrassSprites; ++i)
     {
-        grassSprite.setPosition(sf::Vector2f(rand() % (window.getSize().x - grassTexture.getSize().x), rand() % (window.getSize().y - grassTexture.getSize().y)));
+        grassSprite.setPosition(sf::Vector2f((float)(rand() % (window.getSize().x - grassTexture.getSize().x)), (float)(rand() % (window.getSize().y - grassTexture.getSize().y))));
+        grassSprite.setColor(sf::Color(0, rand() % 255, 0));
+
+        int scaleTen = 5 + rand() % 10;
+        float scale = scaleTen / 10.0f;
+        grassSprite.setScale(scale, scale);
         grassSpriteVector.push_back(grassSprite);
     }
 
+    std::vector<sf::Sprite> stickSpriteVector;
+    size_t numStickSprites = 1;
+
+    for (size_t i = 0; i < numStickSprites; ++i)
+    {
+        stickSprite.setPosition(sf::Vector2f((float)(rand() % (window.getSize().x - stickTexture.getSize().x)), (float)(rand() % (window.getSize().y - stickTexture.getSize().y))));
+        stickSprite.setRotation((float)(rand()% 360));
+        stickSpriteVector.push_back(stickSprite);
+    }
+
     //postion
-    playerSprite.setPosition(sf::Vector2f(0.0f, 100.0f));
+    playerSprite.setPosition(sf::Vector2f(200.0f, 200.0f));
+
+
+    //colour example
+    //playerSprite.setColor(sf::Color::Cyan);
+
+    //rotation example
+    //playerSprite.setRotation(90);
+
+    //scale example
+    //playerSprite.setScale(sf::Vector2f(3.0f, 3.0f));
+
+    //origin example
+    playerSprite.setOrigin((float)(playerTexture.getSize().x / 2), (float)(playerTexture.getSize().y / 2));
+
+
+    //Load font
+    sf::Font gameFont;
+    gameFont.loadFromFile("Assets/GameFont.ttf");
+
+    //Create text objects
+    sf::Text gameTitle;
+    gameTitle.setFont(gameFont);
+    gameTitle.setString("Pick Up Sticks");
+    float textWidth = gameTitle.getLocalBounds().width;
+    gameTitle.setPosition(window.getSize().x / 2.0f - textWidth / 2.0f, 10.0f);
+
+    sf::Text scoreLabel;
+    scoreLabel.setFont(gameFont);
+    scoreLabel.setString("Score: 0000");
+    scoreLabel.setPosition(0, 10.0f);
+    
 
 #pragma endregion
 
@@ -103,13 +163,20 @@ int main()
         {
             window.draw(grassSpriteVector[i]);
         }
-        window.draw(playerSprite);
 
+        for (size_t i = 0; i < stickSpriteVector.size(); i++)
+        {
+            window.draw(stickSpriteVector[i]);
+        }
+
+        window.draw(playerSprite);
+        window.draw(scoreLabel);
+        window.draw(gameTitle);
         window.display();
 
 
 #pragma endregion
-
+        
     }
 
     return 0;
