@@ -17,10 +17,13 @@ int main()
 
     srand(time(NULL));
 
+    //Textures
+
     sf::Texture playerTexture;
     sf::Texture grassTexture;
     sf::Texture stickTexture;
 
+    //Check for texture img
 
     if (!playerTexture.loadFromFile("Assets/Player_Stand.png"))
     {
@@ -52,18 +55,30 @@ int main()
         std::cout << "Texture load was successful for Assets/Stick.png" << std::endl;
     }
 
+    //Sprites
     sf::Sprite playerSprite;
     sf::Sprite grassSprite;
     sf::Sprite stickSprite;
+
+    //Player Sprite
+
     playerSprite.setTexture(playerTexture);
+
+    playerSprite.setPosition(sf::Vector2f(200.0f, 200.0f));
+    playerSprite.setOrigin((float)(playerTexture.getSize().x / 2), (float)(playerTexture.getSize().y / 2));
+
     grassSprite.setTexture(grassTexture);
     stickSprite.setTexture(stickTexture);
+
+
+    //Grass Sprite
 
     std::vector<sf::Sprite> grassSpriteVector;
     size_t numGrassSprites = 15;
 
     for (size_t i = 0; i < numGrassSprites; ++i)
     {
+        grassSprite.setOrigin((grassTexture.getSize().x / 2.0f), (grassTexture.getSize().y / 2.0f));
         grassSprite.setPosition(sf::Vector2f((float)(rand() % (window.getSize().x - grassTexture.getSize().x)), (float)(rand() % (window.getSize().y - grassTexture.getSize().y))));
         grassSprite.setColor(sf::Color(0, rand() % 255, 0));
 
@@ -73,18 +88,19 @@ int main()
         grassSpriteVector.push_back(grassSprite);
     }
 
+
+    //Stick Sprite
+
     std::vector<sf::Sprite> stickSpriteVector;
     size_t numStickSprites = 1;
 
     for (size_t i = 0; i < numStickSprites; ++i)
     {
+        stickSprite.setOrigin((stickTexture.getSize().x / 2.0f), (stickTexture.getSize().y / 2.0f));
         stickSprite.setPosition(sf::Vector2f((float)(rand() % (window.getSize().x - stickTexture.getSize().x)), (float)(rand() % (window.getSize().y - stickTexture.getSize().y))));
         stickSprite.setRotation((float)(rand()% 360));
         stickSpriteVector.push_back(stickSprite);
     }
-
-    //postion
-    playerSprite.setPosition(sf::Vector2f(200.0f, 200.0f));
 
 
     //colour example
@@ -97,9 +113,11 @@ int main()
     //playerSprite.setScale(sf::Vector2f(3.0f, 3.0f));
 
     //origin example
-    playerSprite.setOrigin((float)(playerTexture.getSize().x / 2), (float)(playerTexture.getSize().y / 2));
+    //playerSprite.setOrigin((float)(playerTexture.getSize().x / 2), (float)(playerTexture.getSize().y / 2));
 
 
+
+    //FONT
     //Load font
     sf::Font gameFont;
     gameFont.loadFromFile("Assets/GameFont.ttf");
@@ -115,7 +133,6 @@ int main()
     scoreLabel.setFont(gameFont);
     scoreLabel.setString("Score: 0000");
     scoreLabel.setPosition(0, 10.0f);
-    
 
 #pragma endregion
 
