@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include <vector>
 #include <stdlib.h>
@@ -14,6 +15,7 @@ int main()
 
 
     sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Pick Up Sticks", sf::Style::None);
+    window.setFramerateLimit(60);
 
     srand(time(NULL));
 
@@ -62,9 +64,13 @@ int main()
 
     //Player Sprite
 
+    float xVelocity = 3;
+    float yVelocity = 3;
+    sf::Vector2f playerPosition(100.0f, 100.0f);
+
     playerSprite.setTexture(playerTexture);
 
-    playerSprite.setPosition(sf::Vector2f(200.0f, 200.0f));
+    playerSprite.setPosition(playerPosition);
     playerSprite.setOrigin((float)(playerTexture.getSize().x / 2), (float)(playerTexture.getSize().y / 2));
 
     grassSprite.setTexture(grassTexture);
@@ -129,10 +135,31 @@ int main()
     float textWidth = gameTitle.getLocalBounds().width;
     gameTitle.setPosition(window.getSize().x / 2.0f - textWidth / 2.0f, 10.0f);
 
+    gameTitle.setFillColor(sf::Color::Black);
+
+
     sf::Text scoreLabel;
+    int score;
+    std::string scoreToString = score;
     scoreLabel.setFont(gameFont);
-    scoreLabel.setString("Score: 0000");
-    scoreLabel.setPosition(0, 10.0f);
+    scoreLabel.setString("Score: " + scoreToString);
+    float scoreLabelWidth = scoreLabel.getLocalBounds().width;
+    scoreLabel.setPosition(window.getSize().x - scoreLabelWidth, 10.0f);
+
+
+
+    //Sound
+    sf::SoundBuffer startSFXBuffer;
+    startSFXBuffer.loadFromFile("Assets/Start.wav");
+
+    sf::Sound startSFX;
+    startSFX.setBuffer(startSFXBuffer);
+    startSFX.play();
+    
+    sf::Music gameMusic;
+    gameMusic.openFromFile("Assets/GameMusic.OGG");
+    gameMusic.setLoop(true);
+    //gameMusic.play();
 
 #pragma endregion
 
@@ -150,6 +177,7 @@ int main()
         sf::Event event;
         while (window.pollEvent(event))
         {
+
             if (event.type == sf::Event::KeyPressed)
             {
                 if (event.key.code == sf::Keyboard::Escape)
@@ -162,6 +190,28 @@ int main()
                 window.close();
         }
 
+#pragma endregion
+
+
+    //------------------------------------------------------------
+    // Updating
+    //------------------------------------------------------------
+
+#pragma region Updating
+
+
+        playerPosition.x += xVelocity;
+        playerPosition.y += yVelocity;
+        playerSprite.setPosition(playerPosition);
+
+        if ((playerPosition.y + (playerTexture.getSize().y / 2.0f) >= window.getSize().y) | (playerPosition.y - (playerTexture.getSize().y / 2.0f) <= 0))
+        {
+            yVelocity = -yVelocity;
+        }
+        if ((playerPosition.x + (playerTexture.getSize().x / 2.0f) >= window.getSize().x) | (playerPosition.x - (playerTexture.getSize().x / 2.0f) <= 0))
+        {
+            xVelocity = -xVelocity;
+        }
 
 #pragma endregion
 
