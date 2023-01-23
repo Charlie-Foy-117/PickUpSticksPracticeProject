@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdlib.h>
 #include <time.h>
+#include <sstream>
 
 int main()
 {
@@ -137,15 +138,18 @@ int main()
 
     gameTitle.setFillColor(sf::Color::Black);
 
-    /*
+    
     sf::Text scoreLabel;
-    int score;
-    std::string scoreToString = score;
+    int score = 0;
+
+    std::stringstream ss;
+    ss << "Score = " << score;
     scoreLabel.setFont(gameFont);
-    scoreLabel.setString("Score: " + scoreToString);
+    scoreLabel.setString(ss.str());
+
     float scoreLabelWidth = scoreLabel.getLocalBounds().width;
     scoreLabel.setPosition(window.getSize().x - scoreLabelWidth, 10.0f);
-    */
+    
 
 
 
@@ -160,7 +164,7 @@ int main()
     sf::Music gameMusic;
     gameMusic.openFromFile("Assets/GameMusic.OGG");
     gameMusic.setLoop(true);
-    //gameMusic.play();
+    gameMusic.play();
 
 #pragma endregion
 
@@ -200,7 +204,6 @@ int main()
 
 #pragma region Updating
 
-
         playerPosition.x += xVelocity;
         playerPosition.y += yVelocity;
         playerSprite.setPosition(playerPosition);
@@ -208,10 +211,12 @@ int main()
         if ((playerPosition.y + (playerTexture.getSize().y / 2.0f) >= window.getSize().y) || (playerPosition.y - (playerTexture.getSize().y / 2.0f) <= 0))
         {
             yVelocity = -yVelocity;
+            ++score;
         }
         if ((playerPosition.x + (playerTexture.getSize().x / 2.0f) >= window.getSize().x) || (playerPosition.x - (playerTexture.getSize().x / 2.0f) <= 0))
         {
             xVelocity = -xVelocity;
+            ++score;
         }
 
 #pragma endregion
@@ -238,7 +243,7 @@ int main()
         }
 
         window.draw(playerSprite);
-        //window.draw(scoreLabel);
+        window.draw(scoreLabel);
         window.draw(gameTitle);
         window.display();
 
