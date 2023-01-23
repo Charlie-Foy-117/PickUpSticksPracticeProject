@@ -137,7 +137,7 @@ int main()
 
     gameTitle.setFillColor(sf::Color::Black);
 
-
+    /*
     sf::Text scoreLabel;
     int score;
     std::string scoreToString = score;
@@ -145,6 +145,7 @@ int main()
     scoreLabel.setString("Score: " + scoreToString);
     float scoreLabelWidth = scoreLabel.getLocalBounds().width;
     scoreLabel.setPosition(window.getSize().x - scoreLabelWidth, 10.0f);
+    */
 
 
 
@@ -204,11 +205,11 @@ int main()
         playerPosition.y += yVelocity;
         playerSprite.setPosition(playerPosition);
 
-        if ((playerPosition.y + (playerTexture.getSize().y / 2.0f) >= window.getSize().y) | (playerPosition.y - (playerTexture.getSize().y / 2.0f) <= 0))
+        if ((playerPosition.y + (playerTexture.getSize().y / 2.0f) >= window.getSize().y) || (playerPosition.y - (playerTexture.getSize().y / 2.0f) <= 0))
         {
             yVelocity = -yVelocity;
         }
-        if ((playerPosition.x + (playerTexture.getSize().x / 2.0f) >= window.getSize().x) | (playerPosition.x - (playerTexture.getSize().x / 2.0f) <= 0))
+        if ((playerPosition.x + (playerTexture.getSize().x / 2.0f) >= window.getSize().x) || (playerPosition.x - (playerTexture.getSize().x / 2.0f) <= 0))
         {
             xVelocity = -xVelocity;
         }
@@ -237,7 +238,7 @@ int main()
         }
 
         window.draw(playerSprite);
-        window.draw(scoreLabel);
+        //window.draw(scoreLabel);
         window.draw(gameTitle);
         window.display();
 
