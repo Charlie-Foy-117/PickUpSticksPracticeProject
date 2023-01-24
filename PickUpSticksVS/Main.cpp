@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sstream>
+#include <cmath>
 
 int main()
 {
@@ -16,7 +17,6 @@ int main()
 
 
     sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Pick Up Sticks", sf::Style::None);
-    window.setFramerateLimit(60);
 
     srand(time(NULL));
 
@@ -64,9 +64,6 @@ int main()
     sf::Sprite stickSprite;
 
     //Player Sprite
-
-    float xVelocity = 3;
-    float yVelocity = 3;
     sf::Vector2f playerPosition(100.0f, 100.0f);
 
     playerSprite.setTexture(playerTexture);
@@ -166,6 +163,14 @@ int main()
     gameMusic.setLoop(true);
     gameMusic.play();
 
+    //Positioning
+    float xDir = (10 - rand() % 21)/10.0f;
+    float yDir = (10 - rand() % 21)/10.0f;
+    sf::Vector2f direction(xDir, yDir);
+
+   
+    bool dashPressedLastFrame = false;
+
 #pragma endregion
 
     
@@ -204,20 +209,74 @@ int main()
 
 #pragma region Updating
 
-        playerPosition.x += xVelocity;
-        playerPosition.y += yVelocity;
-        playerSprite.setPosition(playerPosition);
+        //movement
+        int player1Controller = 1;
 
-        if ((playerPosition.y + (playerTexture.getSize().y / 2.0f) >= window.getSize().y) || (playerPosition.y - (playerTexture.getSize().y / 2.0f) <= 0))
+        direction.x = 0;
+        direction.y = 0;
+        
+        if (sf::Joystick::isConnected(1))
         {
-            yVelocity = -yVelocity;
-            ++score;
+            
+            
+            float axisX = sf::Joystick::getAxisPosition(player1Controller, sf::Joystick::X);
+            float axisY = sf::Joystick::getAxisPosition(player1Controller, sf::Joystick::Y);
+
+            float deadZone = 25;
+
+            if (abs(axisX) > deadZone || abs(axisY) > deadZone)
+            {
+               direction.x = axisX / 100.0f;
+               direction.y = axisY / 100.0f;
+            }
         }
-        if ((playerPosition.x + (playerTexture.getSize().x / 2.0f) >= window.getSize().x) || (playerPosition.x - (playerTexture.getSize().x / 2.0f) <= 0))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         {
-            xVelocity = -xVelocity;
-            ++score;
+            direction.x = -1;
         }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        {
+            direction.x = 1;
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        {
+            direction.y = -1;
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        {
+            direction.y = 1;
+        }
+
+        sf::Vector2f newPosition = playerSprite.getPosition() + direction * 0.1f;
+        playerSprite.setPosition(newPosition);
+
+        //dashing/blink
+
+        bool dashPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Joystick::isButtonPressed(player1Controller, 0);
+
+        if (dashPressed && !dashPressedLastFrame)
+        {
+            sf::Vector2f blinkPosition = playerSprite.getPosition() + direction * 100.0f;
+            playerSprite.setPosition(blinkPosition);
+        }
+
+        dashPressedLastFrame = dashPressed;
+
+        //spawn a stick with mouse click
+
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        {
+            //getmouse position
+            //get local mouse position (relative to window)
+            sf::Vector2i localPosition = sf::Mouse::getPosition(window);
+            sf::Vector2f mousePositonFloat = (sf::Vector2f)localPosition;
+            //Spawn a stick at that position
+            stickSprite.setPosition(mousePositonFloat);
+            stickSpriteVector.push_back(stickSprite);
+        }
+
+     
+
 
 #pragma endregion
 
