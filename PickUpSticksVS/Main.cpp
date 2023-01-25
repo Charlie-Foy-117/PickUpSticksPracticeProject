@@ -7,6 +7,13 @@
 #include <sstream>
 #include <cmath>
 
+enum class GameState
+{
+    RUNNING, //RUNNING is 0
+    GAME_OVER, //GAME_OVER is 1
+    NUM_GAME_STATES //number of total game states
+};
+
 int main()
 {
     //------------------------------------------------------------
@@ -195,9 +202,13 @@ int main()
     sf::Clock overallTimeClock;
 
     sf::Clock gameTimer;
-    float gameDuration = 5.0f; // how long game lasts
+    float gameDuration = 10.0f; // how long game lasts
 
-    bool gamePlay = true;
+    sf::Clock stickLastSpawn;
+    float stickSpawnCooldown = 1.0f;
+
+    //bool gamePlay = true;
+    GameState currentState = GameState::RUNNING;
 
 #pragma endregion
 
@@ -250,7 +261,7 @@ int main()
         if (remainingGameTimeFloat <= 0)
         {
             remainingGameTimeFloat = 0;
-            gamePlay = false;
+            currentState = GameState::GAME_OVER;
         }
 
         timerString += std::to_string((int)ceil(remainingGameTimeFloat));
@@ -258,7 +269,7 @@ int main()
         timerText.setString(timerString);
 
         //only process game logic when game is running
-        if (gamePlay == true)
+        if (currentState == GameState::RUNNING)
         {
 
 
@@ -324,8 +335,16 @@ int main()
 
             dashPressedLastFrame = dashPressed;
 
-            //spawn a stick with mouse click
+            //spawns stick every second
+            if (stickLastSpawn.getElapsedTime().asSeconds() >= stickSpawnCooldown)
+            {
+                stickLastSpawn.restart();
+                stickSprite.setPosition(sf::Vector2f((float)(rand() % (window.getSize().x - stickTexture.getSize().x)), (float)(rand() % (window.getSize().y - stickTexture.getSize().y))));
+                stickSpriteVector.push_back(stickSprite);
+            }
 
+            //spawn a stick with mouse click
+            /*
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
             {
                 //getmouse position
@@ -335,14 +354,17 @@ int main()
                 //Spawn a stick at that position
                 stickSprite.setPosition(mousePositonFloat);
                 stickSpriteVector.push_back(stickSprite);
-            }
+            }*/
+
+            //check if player is colliding with sticks
+            //TODO next week
         }
         
-        if (!gamePlay)
+        if (currentState == GameState::GAME_OVER)
         {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::R) || sf::Joystick::isButtonPressed(player1Controller, 1))
             {
-                gamePlay = true;
+                currentState = GameState::RUNNING;
                 stickSpriteVector.clear();
                 //Reset score
                 gameTimer.restart();
@@ -379,7 +401,7 @@ int main()
         window.draw(scoreLabel);
         window.draw(gameTitle);
 
-        if (!gamePlay)
+        if (currentState == GameState::GAME_OVER)
         {
             window.draw(gameOverMsg);
             window.draw(restartText);
