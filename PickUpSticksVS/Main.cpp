@@ -4,7 +4,6 @@
 #include <vector>
 #include <stdlib.h>
 #include <time.h>
-#include <sstream>
 #include <cmath>
 
 enum class GameState
@@ -142,18 +141,6 @@ int main()
 
     gameTitle.setFillColor(sf::Color::Black);
 
-    
-    sf::Text scoreLabel;
-    int score = 0;
-
-    std::stringstream ss;
-    ss << "Score = " << score;
-    scoreLabel.setFont(gameFont);
-    scoreLabel.setString(ss.str());
-
-    float scoreLabelWidth = scoreLabel.getLocalBounds().width;
-    //scoreLabel.setPosition(window.getSize().x - scoreLabelWidth, 10.0f);
-
     sf::Text timerText;
     timerText.setFont(gameFont);
     timerText.setString("Time Left: ");
@@ -175,6 +162,12 @@ int main()
     restartText.setPosition(window.getSize().x / 2.0f - restartTextWidth / 2.0f, window.getSize().y / 2.0f + 100.0f);
     restartText.setFillColor(sf::Color::Black);
 
+    sf::Text scoreText;
+    scoreText.setFont(gameFont);
+    scoreText.setString("Time Left: ");
+    scoreText.setCharacterSize(30);
+
+    scoreText.setPosition(10.0f, 10.0f);
 
 
     //Sound
@@ -197,6 +190,8 @@ int main()
 
    
     bool dashPressedLastFrame = false;
+
+    int score = 0;
 
     sf::Clock deltaTimeClock;
     sf::Clock overallTimeClock;
@@ -268,10 +263,15 @@ int main()
         //display time passed this game
         timerText.setString(timerString);
 
+        std::string scoreString = "Score: ";
+        scoreString += std::to_string((int)ceil(score));
+        scoreText.setString(scoreString);
+
+
+
         //only process game logic when game is running
         if (currentState == GameState::RUNNING)
         {
-
 
 
             //movement
@@ -358,6 +358,23 @@ int main()
 
             //check if player is colliding with sticks
             //TODO next week
+            sf::FloatRect playerBounds = playerSprite.getGlobalBounds();
+            for (auto it = stickSpriteVector.begin(); it != stickSpriteVector.end(); )
+            //for (int i = stickSpriteVector.size() - 1; i >= 0; --i)
+            {
+                sf::FloatRect stickBounds = it->getGlobalBounds();
+                //if stick and player overlap delete stick and add to score and update score text
+                if (playerBounds.intersects(stickBounds))
+                {
+                    it = stickSpriteVector.erase(it);
+                    ++score;
+                }
+                else
+                {
+                    //add iterator here since we didint erase
+                    ++it;
+                }
+            }
         }
         
         if (currentState == GameState::GAME_OVER)
@@ -368,6 +385,7 @@ int main()
                 stickSpriteVector.clear();
                 //Reset score
                 gameTimer.restart();
+                score = 0;
                 playerSprite.setPosition(playerPosition);
             }
         }
@@ -398,7 +416,7 @@ int main()
 
         window.draw(playerSprite);
         window.draw(timerText);
-        window.draw(scoreLabel);
+        window.draw(scoreText);
         window.draw(gameTitle);
 
         if (currentState == GameState::GAME_OVER)
