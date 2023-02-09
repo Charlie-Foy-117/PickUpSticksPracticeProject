@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <cmath>
+#include "Animation.h"
 
 enum class GameState
 {
@@ -28,22 +29,41 @@ int main()
 
     //Textures
 
-    sf::Texture playerTexture;
+    sf::Texture playerStandTexture;
+    sf::Texture playerWalk01Texture;
+    sf::Texture playerWalk02Texture;
     sf::Texture grassTexture;
     sf::Texture stickTexture;
 
     //Check for texture img
 
-    if (!playerTexture.loadFromFile("Assets/Player_Stand.png"))
+    if (!playerStandTexture.loadFromFile("Assets/Player_Stand_1.png"))
     {
         //error
         std::cout << "Texture load failed for Assets/Player_Stand.png" << std::endl;
     }
     else
     {
-        std::cout << "Texture load was successful for Assets/Player_Stand.png" << std::endl;
+        std::cout << "Texture load was successful for Assets/Player_Stand_1.png" << std::endl;
     }
-
+    if (!playerWalk01Texture.loadFromFile("Assets/Player_Walk_1.png"))
+    {
+        //error
+        std::cout << "Texture load failed for Assets/Player_Walk_1.png" << std::endl;
+    }
+    else
+    {
+        std::cout << "Texture load was successful for Assets/Player_Walk_1.png" << std::endl;
+    }
+    if (!playerWalk02Texture.loadFromFile("Assets/Player_Walk_2.png"))
+    {
+        //error
+        std::cout << "Texture load failed for Assets/Player_Walk_2.png" << std::endl;
+    }
+    else
+    {
+        std::cout << "Texture load was successful for Assets/Player_Walk_2.png" << std::endl;
+    }
     if (!grassTexture.loadFromFile("Assets/Grass.png"))
     {
         //error
@@ -53,7 +73,6 @@ int main()
     {
         std::cout << "Texture load was successful for Assets/Grass.png" << std::endl;
     }
-
     if (!stickTexture.loadFromFile("Assets/Stick.png"))
     {
         //error
@@ -64,18 +83,26 @@ int main()
         std::cout << "Texture load was successful for Assets/Stick.png" << std::endl;
     }
 
+
+    
+
+
     //Sprites
     sf::Sprite playerSprite;
     sf::Sprite grassSprite;
     sf::Sprite stickSprite;
 
+    Animation playerAnimation(&playerSprite, "Assets/Player", 12.0f);
+    playerAnimation.AddClip("Stand", 1, false);
+    playerAnimation.AddClip("Walk", 2, true);
+
     //Player Sprite
     sf::Vector2f playerPosition(100.0f, 100.0f);
 
-    playerSprite.setTexture(playerTexture);
+    playerSprite.setTexture(playerStandTexture);
 
     playerSprite.setPosition(playerPosition);
-    playerSprite.setOrigin((float)(playerTexture.getSize().x / 2), (float)(playerTexture.getSize().y / 2));
+    playerSprite.setOrigin((float)(playerStandTexture.getSize().x / 2), (float)(playerStandTexture.getSize().y / 2));
 
     grassSprite.setTexture(grassTexture);
     stickSprite.setTexture(stickTexture);
@@ -312,6 +339,14 @@ int main()
                 direction.y = 1;
             }
 
+            if (direction.x != 0 || direction.y != 0)
+            {
+                playerAnimation.Play("Walk");
+            }
+            else
+            {
+                playerAnimation.Play("Stand");
+            }
 
             //update player position based on movement direction
             float speed = 500;
@@ -375,7 +410,11 @@ int main()
                     ++it;
                 }
             }
-        }
+
+            //process animation
+            playerAnimation.Update();
+
+        } //end of game running if statement
         
         if (currentState == GameState::GAME_OVER)
         {
